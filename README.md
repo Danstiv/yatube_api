@@ -79,50 +79,54 @@ python manage.py runserver
 
 Далее необходимо получить пару токенов (API использует JWT токены).
 
-Во всех примерах будет использоваться библиотека requests.
+`POST /api/v1/jwt/create/`
 
+В теле запроса нужно отправить json:
 
-```
-import requests
-url = 'http://localhost:8000/api/v1'
-response = requests.post(url+'/jwt/create/', json={'username': 'your_username', 'password': 'your_password'}).json()
-access_token = response['access']
-refresh_token = response['refresh']
-headers={'Authorization': 'Bearer '+access_token}
-session = requests.Session()  # Для удобства
-session.headers = headers
-```
+`{"username": "your_username", "password": "your_password"}`
+
+В ответе будет json с полями
+
+access - ваш токен.
+
+refresh - токен для обновления access токена.
 
 Теперь access_token можно использовать для выполнения любых запросов.
 
-```
-# Создание поста
-response = session.post(url+'/posts/', json={'text': 'Тестовый пост'})
->>> response
-<Response [201]>
->>> response.json()
-{'id': 1, 'author': 'Danstiv', 'text': 'Тестовый пост', 'pub_date': '2022-04-07T07:42:56.706607Z', 'image': None, 'group': None}
-# Комментирование поста
-response = session.post(url+'/posts/1/comments/', json={'text': 'Комментарий'})
->>> response
-<Response [201]>
->>> response.json()
-{'id': 1, 'author': 'Danstiv', 'post': 1, 'text': 'Комментарий', 'created': '2022-04-07T07:49:44.293343Z'}
-# Получение постов
-response = session.get(url+'/posts/')
->>> response
-<Response [200]>
->>> response.json()
-[{'id': 1, 'author': 'Danstiv', 'text': 'Тестовый пост', 'pub_date': '2022-04-07T07:42:56.706607Z', 'image': None, 'group': None}]
-# Удаление поста
-response = session.delete(url+'/posts/1/')
->>> response
-<Response [204]>
-# Его больше нет
-response = session.get(url+'/posts/')
->>> response
-<Response [200]>
->>> response.json()
-[]
-```
+Создание поста:
+
+`POST /api/v1/posts/`
+
+Тело запроса:
+
+`{"text": "post text"}`
+
+Ответ:
+
+`{'id': 1, 'author': 'Danstiv', 'text': 'Тестовый пост', 'pub_date': '2022-04-07T07:42:56.706607Z', 'image': None, 'group': None}`
+
+Комментирование поста
+
+`POST /api/v1/posts/1/comments/`
+
+Тело запроса:
+
+`{"text": "comment text"}`
+
+Ответ:
+
+`{'id': 1, 'author': 'Danstiv', 'post': 1, 'text': 'Комментарий', 'created': '2022-04-07T07:49:44.293343Z'}`
+
+Получение постов
+
+`GET /api/v1/posts/`
+
+Ответ:
+
+`[{'id': 1, 'author': 'Danstiv', 'text': 'Тестовый пост', 'pub_date': '2022-04-07T07:42:56.706607Z', 'image': None, 'group': None}]`
+
+Удаление поста:
+
+DELETE /api/v1/posts/1/
+
 Параметры и примеры запросов / ответов вы также можете посмотреть в документации.
